@@ -11,8 +11,21 @@ var io = socketIO(server);
 io.on('connection', (socket) => {
   console.log('User connected');
 
+  socket.emit('newMessage', {
+    from: 'Server',
+    text: 'Message(Server): Welcome!',
+    createdAt: new Date()
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected');
+  });
+  socket.on('createMessage', ({to, text}) => {
+    if (to && text) {
+      console.log(`${new Date()}  ${to}: ${text}`);
+    } else {
+      console.log('Received invalid message');
+    }
   });
 });
 
