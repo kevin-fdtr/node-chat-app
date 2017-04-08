@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-const message = require('../shared/message');
+const message = require('./utils/message');
 
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -12,19 +12,13 @@ var server = http.createServer(app);
 var io = socketIO(server);
 io.on('connection', (socket) => {
   console.log('User connected');
-  socket.emit('newMessage', message.createMessage({
-    from: 'Admin',
-    text: 'Welcome to the Chat App'
-  }));
-  socket.broadcast.emit('newMessage', message.createMessage({
-    from: 'Admin',
-    text: 'New user joined'
-  }));
+  socket.emit('newMessage', message.generateMessage('Admin', 'Welcome to the Chat App'));
+  socket.broadcast.emit('newMessage', message.generateMessage('Admin','New user joined'));
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
   socket.on('createMessage', ({from, text}) => {
-    newMessage = message.createMessage({from, text});
+    newMessage = message.generateMessage(from, text);
     if (newMessage) {
       console.log(`Message reveived: ${newMessage.createdAt}`);
       io.emit( 'newMessage', newMessage);
