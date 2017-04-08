@@ -17,11 +17,14 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
-  socket.on('createMessage', ({from, text}) => {
+  socket.on('createMessage', ({from, text}, callback) => {
     newMessage = message.generateMessage(from, text);
     if (newMessage) {
       console.log(`Message reveived: ${newMessage.createdAt}`);
       io.emit( 'newMessage', newMessage);
+      callback({
+        status: 'Ok'
+      });
     } else {
       console.log('Received invalid message');
     }
