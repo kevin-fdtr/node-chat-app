@@ -12,7 +12,14 @@ var server = http.createServer(app);
 var io = socketIO(server);
 io.on('connection', (socket) => {
   console.log('User connected');
-
+  socket.emit('newMessage', message.createMessage({
+    from: 'Admin',
+    text: 'Welcome to the Chat App'
+  }));
+  socket.broadcast.emit('newMessage', message.createMessage({
+    from: 'Admin',
+    text: 'New user joined'
+  }));
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
