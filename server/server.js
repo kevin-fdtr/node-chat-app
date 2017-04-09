@@ -22,9 +22,7 @@ io.on('connection', (socket) => {
     if (newMessage) {
       console.log(`Message reveived: ${newMessage.createdAt}`);
       io.emit( 'newMessage', newMessage);
-      callback({
-        status: 'Ok'
-      });
+      callback();
     } else {
       console.log('Received invalid message');
     }
