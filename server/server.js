@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-const message = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -12,13 +12,13 @@ var server = http.createServer(app);
 var io = socketIO(server);
 io.on('connection', (socket) => {
   console.log('User connected');
-  socket.emit('newMessage', message.generateMessage('Admin', 'Welcome to the Chat App'));
-  socket.broadcast.emit('newMessage', message.generateMessage('Admin','New user joined'));
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Chat App'));
+  socket.broadcast.emit('newMessage', generateMessage('Admin','New user joined'));
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
   socket.on('createMessage', ({from, text}, callback) => {
-    newMessage = message.generateMessage(from, text);
+    newMessage = generateMessage(from, text);
     if (newMessage) {
       console.log(`Message reveived: ${newMessage.createdAt}`);
       io.emit( 'newMessage', newMessage);
@@ -28,6 +28,13 @@ io.on('connection', (socket) => {
     } else {
       console.log('Received invalid message');
     }
+  });
+  socket.on('createLocationMessage', (coords) => {
+    var newMessage = generateLocationMessage('Admin', coords.latitude, coords.longitude);
+    if (newMessage) {
+      io.emit('newLocationMessage', newMessage);
+    }
+
   });
 });
 
