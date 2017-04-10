@@ -38,6 +38,7 @@ socket.on('updateUserList', function (users) {
         ol.append(jQuery('<li></li>').text(user));
     });
     jQuery('#users').html(ol);
+
 });
 
 socket.on('newMessage', function (message) {
@@ -58,6 +59,7 @@ socket.on('newLocationMessage', function (message) {
     var html = Mustache.render(template, {
       url: message.url,
       from: message.from,
+      text: message.text,
       createdAt: formattedTime  
     });
     jQuery('#messages').append(html);
@@ -67,8 +69,8 @@ socket.on('newLocationMessage', function (message) {
 jQuery('#message-form').on('submit', function(e) {
     e.preventDefault();
     var messageTextbox = jQuery('[name=message]');
+
     socket.emit('createMessage', {
-        from: 'User',
         text: messageTextbox.val()
     }, function() {
         messageTextbox.val('');

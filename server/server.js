@@ -38,22 +38,26 @@ io.on('connection', (socket) => {
 
     callback();
   });
-  socket.on('createMessage', ({from, text}, callback) => {
-    newMessage = generateMessage(from, text);
-    if (newMessage) {
-      console.log(`Message reveived: ${newMessage.createdAt}`);
-      io.emit( 'newMessage', newMessage);
-      callback();
-    } else {
-      console.log('Received invalid message');
+  socket.on('createMessage', ({text}, callback) => {
+    var user = users.getUser(socket.id);
+    if (user && isRealString(text)) {
+      newMessage = generateMessage(user.name, text);
+      if (newMessage) {
+        io.to(user.room).emit( 'newMessage', newMessage);
+        callback();
+      } else {
+        console.log('Received invalid message');
+      }
     }
   });
   socket.on('createLocationMessage', (coords) => {
-    var newMessage = generateLocationMessage('Admin', coords.latitude, coords.longitude);
-    if (newMessage) {
-      io.emit('newLocationMessage', newMessage);
-    }
-
+    var user = users.getUser(socket.id);
+    if (user) {
+      var newMessage = generateLocationMessage(user.name, coords.latitude, coords.longitude);
+      if (newMessage) {
+        io.to(user.room).emit('newLocationMessage', newMessage);
+      }
+    }    
   });
 });
 
